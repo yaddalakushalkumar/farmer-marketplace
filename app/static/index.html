@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KisanDhan Direct - Farmers' Direct Marketplace</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <span class="logo-icon">🌾</span>
+                <span class="logo-text">KisanDhan Direct</span>
+            </a>
+            
+            <div class="nav-controls">
+                <!-- Role Switcher -->
+                <div class="role-switcher">
+                    <button id="btnBuyerView" class="role-btn active" data-translate="buyerPortal">Customer Storefront</button>
+                    <button id="btnFarmerView" class="role-btn" data-translate="farmerPortal">Farmer Dashboard</button>
+                </div>
+
+                <!-- Language Selector -->
+                <div class="lang-selector-container">
+                    <span class="lang-icon">🌐</span>
+                    <select id="langSelect" class="lang-select">
+                        <option value="en">English</option>
+                        <option value="hi">हिन्दी (Hindi)</option>
+                        <option value="ta">தமிழ் (Tamil)</option>
+                        <option value="te">తెలుగు (Telugu)</option>
+                        <option value="mr">मराठी (Marathi)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 data-translate="appName">KisanDhan Direct</h1>
+        <p data-translate="tagline">Connecting Farmers Directly to Customers</p>
+    </section>
+
+    <!-- Main Content Container -->
+    <main>
+        
+        <!-- ================= CUSTOMER PORTAL ================= -->
+        <section id="buyerSection" class="storefront">
+            
+            <!-- Left Side: Catalog -->
+            <div class="catalog-container">
+                <div class="filter-bar">
+                    <!-- Category Tabs -->
+                    <div class="category-tabs">
+                        <button class="category-tab active" data-category="all" data-translate="allCategories">All Products</button>
+                        <button class="category-tab" data-category="Grains" data-translate="grains">Grains</button>
+                        <button class="category-tab" data-category="Fruits" data-translate="fruits">Fruits</button>
+                        <button class="category-tab" data-category="Vegetables" data-translate="vegetables">Vegetables</button>
+                        <button class="category-tab" data-category="Spices" data-translate="spices">Spices</button>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <input type="text" id="productSearch" placeholder="Search products...">
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div id="productsGrid" class="products-grid">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- Right Side: Sidebar Cart -->
+            <aside class="cart-panel">
+                <div class="cart-header">
+                    <h3 data-translate="cartTitle">Shopping Cart</h3>
+                    <span>🛒</span>
+                </div>
+                
+                <!-- Scrollable Cart Items -->
+                <div id="cartItems" class="cart-items">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <!-- Price Breakdown & Fees -->
+                <div id="cartSummaryBlock" class="cart-summary hidden">
+                    <div class="summary-row">
+                        <span data-translate="subtotal">Product Price</span>
+                        <span id="cartSubtotal">₹0.00</span>
+                    </div>
+                    <div class="summary-row fee">
+                        <span data-translate="platformFee">Platform Settlement Fee (5%)</span>
+                        <span id="cartPlatformFee">-₹0.00</span>
+                    </div>
+                    <div class="summary-row payout">
+                        <span data-translate="directPayout">Direct Farmer Payout (95%)</span>
+                        <span id="cartDirectPayout">₹0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span data-translate="totalAmount">Total Payable (INR)</span>
+                        <span id="cartTotal">₹0.00</span>
+                    </div>
+                </div>
+
+                <button id="checkoutActionBtn" class="btn-checkout" data-translate="checkoutBtn" onclick="openCheckoutModal()" disabled>
+                    Proceed to Direct Payment
+                </button>
+            </aside>
+        </section>
+
+        <!-- ================= FARMER PORTAL ================= -->
+        <section id="farmerSection" class="farmer-dashboard hidden">
+            
+            <!-- Left Side: Registration / Selection Login -->
+            <div class="dashboard-sidebar">
+                
+                <!-- Farmer Login/Selection Panel -->
+                <div id="farmerLoginPanel" class="glass-card">
+                    <h2 data-translate="farmerPortal">Farmer Dashboard</h2>
+                    <div class="form-group">
+                        <label for="selectActiveFarmer" data-translate="languageLabel">Select Account</label>
+                        <select id="selectActiveFarmer">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <button id="btnDashboardLogin" class="btn-submit">Access Dashboard</button>
+                </div>
+
+                <!-- Farmer Registration Form -->
+                <div class="glass-card">
+                    <h2 data-translate="farmerRegTitle">Register as a Government Verified Farmer</h2>
+                    <form id="farmerRegForm">
+                        <div class="form-group">
+                            <label for="farmerGovtId" data-translate="govtIdLabel">Government-Issued Farmer ID</label>
+                            <input type="text" id="farmerGovtId" placeholder="e.g. FARM-IN-2026-XXXX" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="farmerName" data-translate="farmerNameLabel">Farmer Full Name</label>
+                            <input type="text" id="farmerName" placeholder="e.g. Rajesh Kumar" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="farmerPhone" data-translate="farmerPhoneLabel">Farmer Mobile Number</label>
+                            <input type="tel" id="farmerPhone" placeholder="e.g. 9876543210" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="farmerBank" data-translate="bankNameLabel">Bank Name</label>
+                            <input type="text" id="farmerBank" placeholder="e.g. State Bank of India" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="farmerAccount" data-translate="accNumLabel">Bank Account Number</label>
+                            <input type="password" id="farmerAccount" placeholder="Enter bank account number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="farmerIfsc" data-translate="ifscLabel">Bank IFSC Code</label>
+                            <input type="text" id="farmerIfsc" placeholder="e.g. SBIN0001234" required>
+                        </div>
+                        <button type="submit" class="btn-submit" data-translate="registerBtn">Register & Setup Shop</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Side: Active Farmer Dashboard (Hidden until logged in) -->
+            <div id="farmerDashboardPanel" class="dashboard-main glass-card hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); padding-bottom:1rem; margin-bottom:1.5rem;">
+                    <div>
+                        <h2 style="border:none; margin:0;" id="dashFarmerName">Farmer Name</h2>
+                        <p style="font-size:0.85rem; color:var(--text-muted);">
+                            Govt ID: <span id="dashFarmerGovtId">FARM-XXXX</span>
+                        </p>
+                    </div>
+                    <button id="btnFarmerLogout" class="role-btn" style="background:#e53e3e; color:#fff; padding:0.4rem 1rem;">Logout</button>
+                </div>
+
+                <!-- Stats Blocks -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 data-translate="statBalance">Net Directly Credited to Bank Account</h3>
+                        <div id="dashBalance" class="stat-value">₹0.00</div>
+                        <div class="stat-sub" data-translate="txnCompleted">Settled Directly via Payment Gateway</div>
+                    </div>
+                    <div class="stat-card accent">
+                        <h3 data-translate="statBank">Bank Details</h3>
+                        <div id="dashBankName" style="font-weight:700; font-size:1.1rem; margin-bottom:0.25rem;">SBI</div>
+                        <div style="font-size:0.9rem;">Acc: <span id="dashAccNumber">******1234</span></div>
+                        <div style="font-size:0.8rem; opacity:0.85;">IFSC: <span id="dashIfsc">SBIN0001234</span></div>
+                    </div>
+                </div>
+
+                <!-- Add New Product Listing -->
+                <div class="glass-card" style="margin-bottom:2rem; background:#f7f9f6; border-color:rgba(30, 92, 54, 0.15);">
+                    <h3 data-translate="addProductTitle" style="margin-bottom:1rem;">Add New Product for Sale</h3>
+                    <form id="addProductForm" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="prodTitle" data-translate="prodTitleLabel">Product Title</label>
+                            <input type="text" id="prodTitle" placeholder="e.g. Alphonso Mangoes" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="prodCategory" data-translate="prodCategoryLabel">Category</label>
+                            <select id="prodCategory">
+                                <option value="Grains">Grains</option>
+                                <option value="Fruits">Fruits</option>
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Spices">Spices</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="prodPrice" data-translate="prodPriceLabel">Price per Unit</label>
+                            <input type="number" id="prodPrice" step="0.01" min="1" placeholder="Price in ₹" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="prodUnit" data-translate="prodUnitLabel">Unit</label>
+                            <input type="text" id="prodUnit" placeholder="e.g. kg, dozen, quintal" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="prodStock" data-translate="prodStockLabel">Available Stock</label>
+                            <input type="number" id="prodStock" step="0.1" min="0" placeholder="Available quantity" required>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="prodImgUrl" data-translate="prodImgLabel">Product Image URL (Optional)</label>
+                            <input type="url" id="prodImgUrl" placeholder="https://images.unsplash.com/...">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="prodDesc" data-translate="prodDescLabel">Product Description</label>
+                            <textarea id="prodDesc" rows="3" placeholder="Briefly describe your product..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit" style="grid-column: span 2;" data-translate="listProductBtn">Publish Product for Sale</button>
+                    </form>
+                </div>
+
+                <!-- Farmer's Current Shop Listings -->
+                <div class="glass-card" style="margin-bottom:2rem;">
+                    <h3 style="margin-bottom:0.75rem;">Your Active Listings</h3>
+                    <ul id="farmerProductsList" style="list-style:none;">
+                        <!-- Rendered via JS -->
+                    </ul>
+                </div>
+
+                <!-- Settlements Ledger Table -->
+                <div class="glass-card">
+                    <h3 data-translate="txnHistoryTitle">Recent Direct Sales & Settlements</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-translate="txnId">Txn ID</th>
+                                    <th data-translate="txnDate">Date</th>
+                                    <th data-translate="txnProduct">Product</th>
+                                    <th data-translate="txnBuyer">Buyer</th>
+                                    <th data-translate="txnGross">Gross Paid</th>
+                                    <th>Fee (5%)</th>
+                                    <th data-translate="txnNet">Net Settled</th>
+                                    <th data-translate="txnStatus">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledgerTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= CHECKOUT / PAYMENT MODAL ================= -->
+    <div id="checkoutModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle" data-translate="checkoutTitle">Direct-to-Farmer UPI Payment</h3>
+                <button id="modalClose" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- 1. Customer Payment Form & Info -->
+                <div id="paymentFormContainer">
+                    <form id="paymentForm">
+                        <div class="form-group">
+                            <label for="buyerName" data-translate="buyerNameLabel">Your Name</label>
+                            <input type="text" id="buyerName" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="buyerPhone" data-translate="buyerPhoneLabel">Your Phone Number</label>
+                            <input type="tel" id="buyerPhone" placeholder="Enter 10-digit mobile number" required>
+                        </div>
+
+                        <!-- Price summary -->
+                        <div class="payment-summary">
+                            <div class="payment-sum-row">
+                                <span data-translate="subtotal">Product Subtotal</span>
+                                <span id="paySumGross">₹0.00</span>
+                            </div>
+                            <div class="payment-sum-row" style="color:#e53e3e;">
+                                <span data-translate="platformFee">Platform Fee (5%)</span>
+                                <span id="paySumFee">₹0.00</span>
+                            </div>
+                            <div class="payment-sum-row" style="color:var(--primary-light); font-weight:600;">
+                                <span data-translate="directPayout">Direct to Farmers</span>
+                                <span id="paySumPayout">₹0.00</span>
+                            </div>
+                            <div class="payment-sum-row total">
+                                <span data-translate="totalAmount">Total Payable (INR)</span>
+                                <span id="paySumGross">₹0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- UPI Simulated Scan UI -->
+                        <div class="upi-simulation-box">
+                            <p style="font-size:0.8rem; color:var(--text-muted);">Scan QR using any UPI app to pay directly</p>
+                            <div id="qrPlaceholder" class="qr-code-placeholder">
+                                <!-- Dynamic SVG loaded here -->
+                            </div>
+                            <div class="upi-apps">
+                                <span class="upi-app-badge">BHIM</span>
+                                <span class="upi-app-badge">GPay</span>
+                                <span class="upi-app-badge">PhonePe</span>
+                                <span class="upi-app-badge">Paytm</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btnPayUPI" class="btn-checkout">Pay via UPI</button>
+                    </form>
+                </div>
+
+                <!-- 2. Processing State -->
+                <div id="paymentProcessing" class="processing-state text-center">
+                    <div class="spinner"></div>
+                    <h4 data-translate="loadingText">Processing Direct Bank Transfer...</h4>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem;">Splitting fees and initiating direct transfers to respective farmers' banks.</p>
+                </div>
+
+                <!-- 3. Success Screen & Settlements Report -->
+                <div id="paymentSuccessScreen" class="success-state">
+                    <div class="success-icon">✓</div>
+                    <h3 data-translate="paymentSuccess">Payment Successful!</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">
+                        Gateway UPI Ref: <span id="txnRefId" style="font-weight:700; color:var(--primary-dark);">TXN-XXXX</span>
+                    </p>
+
+                    <!-- Ledger breakdown for farmers credit -->
+                    <div class="settlement-list">
+                        <p style="font-size:0.85rem; font-weight:700; color:var(--primary-dark); margin-bottom:0.75rem;" data-translate="settlementReport">
+                            Bank Credit Settlements (95% net credited directly to Farmer accounts):
+                        </p>
+                        <div id="settlementBreakdownList">
+                            <!-- Settled items list dynamically added -->
+                        </div>
+                    </div>
+
+                    <button id="modalSuccessClose" class="btn-submit" style="margin-top:1.5rem;" data-translate="closeBtn">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/translations.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
