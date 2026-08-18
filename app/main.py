@@ -1,6 +1,8 @@
 import random
 import string
-from fastapi import FastAPI, Depends, HTTPException, status
+import os
+import uuid
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -9,6 +11,13 @@ from pydantic import BaseModel, Field
 
 from .database import engine, Base, get_db, SessionLocal
 from . import models
+
+# Ensure uploads directory exists
+if os.environ.get("VERCEL") == "1" or os.environ.get("VERCEL"):
+    UPLOADS_DIR = "/tmp/uploads"
+else:
+    UPLOADS_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads")
+os.makedirs(UPLOADS_DIR, exist_ok=True)
 
 # Initialize Database tables
 Base.metadata.create_all(bind=engine)
@@ -391,5 +400,49 @@ def get_transactions(farmer_id: Optional[str] = None, db: Session = Depends(get_
         ))
     return out
 
+# 5. Product Image Upload
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Query, Request
+
+# 5. Product Image Upload (updated)
+@app.post("/api/upload-image")
+async def upload_product_image(request: Request, file: UploadFile = File(...)):
+    """Upload a product image and return its public URL."""
+    # Validate file type
+    allowed_types = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed."
+        )
+    # Limit file size to 5 MB
+    contents = await file.read()
+    if len(contents) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large. Max size is 5 MB.")
+
+    # Save with a unique filename to avoid collisions
+    ext = os.path.splitext(file.filename or "image.jpg")[1] or ".jpg"
+    unique_name = f"{uuid.uuid4().hex}{ext}"
+    save_path = os.path.join(UPLOADS_DIR, unique_name)
+    with open(save_path, "wb") as f:
+        f.write(contents)
+
+    # Return absolute URL based on request host
+    base_url = str(request.base_url).rstrip('/')
+    return {"url": f"{base_url}/uploads/{unique_name}"}
+
+# 6. Delete a farmer's own product
+@app.delete("/api/products/{product_id}")
+def delete_product(product_id: int, farmer_id: str = Query(..., description="Government Farmer ID of the owner"), db: Session = Depends(get_db)):
+    """Allow a farmer to delete their own product."""
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    if product.farmer_id != farmer_id:
+        raise HTTPException(status_code=403, detail="Cannot delete product not owned by farmer")
+    db.delete(product)
+    db.commit()
+    return {"detail": "Product deleted successfully"}
+
 # Serve Static files for Front-End UI
-app.mount("/", StaticFiles(directory="app/static", html=True), name="static")
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

@@ -7,6 +7,10 @@ let searchQuery = '';
 let activeFarmerId = '';
 let farmers = [];
 
+// Gallery state
+let galleryImages = [];   // [{url, title, price, unit, category, farmer_name, description}]
+let galleryIndex = 0;
+
 // DOM Elements
 document.addEventListener("DOMContentLoaded", () => {
     init();
@@ -29,6 +33,9 @@ function init() {
 
     // Set up global event handlers
     setupEventHandlers();
+
+    // Set up image upload zone
+    setupImageUpload();
 }
 
 function setupEventHandlers() {
@@ -220,6 +227,7 @@ async function fetchFarmersList() {
 function renderProducts() {
     const grid = document.getElementById("productsGrid");
     grid.innerHTML = "";
+    galleryImages = []; // reset gallery on each render
 
     if (products.length === 0) {
         grid.innerHTML = `<div class="text-center mt-4" style="grid-column: 1/-1; color: var(--text-muted);">No products found.</div>`;
@@ -234,11 +242,24 @@ function renderProducts() {
         const stockClass = p.stock === 0 ? "stock-out" : (p.stock < 10 ? "stock-low" : "stock-ok");
         const stockText = p.stock === 0 ? getTranslationText("outOfStock") : `${getTranslationText("inStock")}: ${p.stock} ${p.unit}`;
 
+        // Build gallery images list from all current products for navigation
+        const galleryIdx = galleryImages.length;
+        galleryImages.push({
+            url: p.image_url || 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&q=80&w=400',
+            title: p.title,
+            price: p.price,
+            unit: p.unit,
+            category: p.category,
+            farmer_name: p.farmer_name || 'Farmer',
+            description: p.description || ''
+        });
+
         card.innerHTML = `
-            <div class="product-image-container">
+            <div class="product-image-container" onclick="openGallery(${galleryIdx})" title="View full image">
                 <img class="product-image" src="${p.image_url}" alt="${p.title}" onerror="this.src='https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&q=80&w=400'">
                 <span class="category-badge">${p.category}</span>
                 <span class="farmer-badge">${getTranslationText("soldBy")}: ${p.farmer_name || 'Farmer'}</span>
+                <div class="gallery-overlay-btn">&#128247;</div>
             </div>
             <div class="product-info">
                 <h3 class="product-title">${p.title}</h3>
@@ -247,7 +268,7 @@ function renderProducts() {
                     <span class="product-price">${getTranslationText("priceUnit", {unit: p.unit})}</span>
                     <span class="product-stock ${stockClass}">${stockText}</span>
                 </div>
-                <button class="btn-add-cart" ${hasStock ? '' : 'disabled'} onclick="addToCart(${p.id})">
+                <button class="btn-add-cart" ${hasStock ? '' : 'disabled'} onclick="event.stopPropagation(); addToCart(${p.id})">
                     <span>🛒</span> ${getTranslationText("addToCart")}
                 </button>
             </div>
@@ -650,7 +671,7 @@ async function listProduct() {
     const price = parseFloat(document.getElementById("prodPrice").value);
     const unit = document.getElementById("prodUnit").value.trim();
     const stock = parseFloat(document.getElementById("prodStock").value);
-    const imgUrl = document.getElementById("prodImgUrl").value.trim();
+    const imgUrl = window._uploadedProductImageUrl || null;
     const desc = document.getElementById("prodDesc").value.trim();
 
     if (!title || !category || isNaN(price) || !unit || isNaN(stock)) {
@@ -679,6 +700,7 @@ async function listProduct() {
         if (res.ok) {
             alert(getTranslationText("alertAddProductSuccess"));
             document.getElementById("addProductForm").reset();
+            clearProductImage(); // reset photo upload zone too
             // Reload dashboard lists and backend products
             loadFarmerDashboard(activeFarmerId);
             fetchProducts();
@@ -690,3 +712,97 @@ async function listProduct() {
         console.error(err);
     }
 }
+
+// ===================== GALLERY LIGHTBOX LOGIC =====================
+
+function openGallery(index) {
+    if (!galleryImages || galleryImages.length === 0) return;
+    galleryIndex = index;
+    renderGallerySlide();
+    renderGalleryThumbs();
+    document.getElementById('galleryLightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeGallery() {
+    document.getElementById('galleryLightbox').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function renderGallerySlide() {
+    const img = galleryImages[galleryIndex];
+    if (!img) return;
+
+    const mainImg = document.getElementById('galleryMainImg');
+    mainImg.classList.add('fade-out');
+
+    setTimeout(() => {
+        mainImg.src = img.url;
+        mainImg.alt = img.title;
+        mainImg.classList.remove('fade-out');
+
+        document.getElementById('galleryTitle').textContent = img.title;
+        document.getElementById('galleryDesc').textContent = img.description;
+        document.getElementById('galleryCounter').textContent = `${galleryIndex + 1} / ${galleryImages.length}`;
+
+        const metaEl = document.getElementById('galleryMeta');
+        metaEl.innerHTML = `
+            <span class="gallery-meta-badge price-badge">&#8377;${img.price} / ${img.unit}</span>
+            <span class="gallery-meta-badge">&#127807; ${img.category}</span>
+            <span class="gallery-meta-badge">&#128104;&#8205;&#127806; ${img.farmer_name}</span>
+        `;
+
+        // Update active thumbnail
+        document.querySelectorAll('.gallery-thumb').forEach((t, i) => {
+            t.classList.toggle('active', i === galleryIndex);
+        });
+
+        // Scroll active thumb into view
+        const activeTh = document.querySelector('.gallery-thumb.active');
+        if (activeTh) activeTh.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }, 180);
+}
+
+function renderGalleryThumbs() {
+    const strip = document.getElementById('galleryThumbStrip');
+    strip.innerHTML = '';
+    galleryImages.forEach((img, i) => {
+        const thumb = document.createElement('img');
+        thumb.className = 'gallery-thumb' + (i === galleryIndex ? ' active' : '');
+        thumb.src = img.url;
+        thumb.alt = img.title;
+        thumb.title = img.title;
+        thumb.onerror = () => { thumb.src = 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&q=80&w=400'; };
+        thumb.addEventListener('click', () => {
+            galleryIndex = i;
+            renderGallerySlide();
+        });
+        strip.appendChild(thumb);
+    });
+}
+
+function galleryNavigate(dir) {
+    galleryIndex = (galleryIndex + dir + galleryImages.length) % galleryImages.length;
+    renderGallerySlide();
+}
+
+// Gallery button event listeners (run after DOM is ready)
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('galleryCloseBtn').addEventListener('click', closeGallery);
+    document.getElementById('galleryPrevBtn').addEventListener('click', () => galleryNavigate(-1));
+    document.getElementById('galleryNextBtn').addEventListener('click', () => galleryNavigate(1));
+
+    // Close on clicking the dark backdrop
+    document.getElementById('galleryLightbox').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('galleryLightbox')) closeGallery();
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        const lb = document.getElementById('galleryLightbox');
+        if (!lb.classList.contains('active')) return;
+        if (e.key === 'Escape')      closeGallery();
+        if (e.key === 'ArrowLeft')   galleryNavigate(-1);
+        if (e.key === 'ArrowRight')  galleryNavigate(1);
+    });
+});

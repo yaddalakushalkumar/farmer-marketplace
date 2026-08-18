@@ -221,8 +221,29 @@
                             <input type="number" id="prodStock" step="0.1" min="0" placeholder="Available quantity" required>
                         </div>
                         <div class="form-group" style="grid-column: span 2;">
-                            <label for="prodImgUrl" data-translate="prodImgLabel">Product Image URL (Optional)</label>
-                            <input type="url" id="prodImgUrl" placeholder="https://images.unsplash.com/...">
+                            <label data-translate="prodImgLabel">Product Photo</label>
+                            <!-- Hidden actual file input -->
+                            <input type="file" id="prodImgFile" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;">
+                            <!-- Upload drop zone -->
+                            <div id="imgUploadZone" class="img-upload-zone" onclick="document.getElementById('prodImgFile').click()">
+                                <div id="imgUploadPrompt" class="img-upload-prompt">
+                                    <div class="img-upload-icon">📷</div>
+                                    <p class="img-upload-label">Click or drag &amp; drop to upload a photo</p>
+                                    <p class="img-upload-sub">JPEG, PNG, WebP or GIF · Max 5 MB</p>
+                                </div>
+                                <div id="imgPreviewWrap" class="img-preview-wrap" style="display:none;">
+                                    <img id="imgPreview" class="img-preview-thumb" src="" alt="Preview">
+                                    <div class="img-preview-actions">
+                                        <span id="imgPreviewName" class="img-preview-name"></span>
+                                        <button type="button" class="img-remove-btn" onclick="event.stopPropagation(); clearProductImage()" title="Remove photo">✕ Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Upload progress bar (hidden by default) -->
+                            <div id="imgUploadProgress" class="img-upload-progress" style="display:none;">
+                                <div class="img-upload-bar" id="imgUploadBar"></div>
+                                <span id="imgUploadStatus">Uploading...</span>
+                            </div>
                         </div>
                         <div class="form-group" style="grid-column: span 2;">
                             <label for="prodDesc" data-translate="prodDescLabel">Product Description</label>
@@ -355,6 +376,36 @@
                 </div>
 
             </div>
+        </div>
+    </div>
+
+    <!-- ================= PRODUCT IMAGE GALLERY LIGHTBOX ================= -->
+    <div id="galleryLightbox" class="gallery-lightbox">
+        <!-- Close button -->
+        <button class="gallery-close-btn" id="galleryCloseBtn" title="Close gallery">&#x2715;</button>
+
+        <!-- Image counter top-right -->
+        <div class="gallery-counter" id="galleryCounter">1 / 1</div>
+
+        <!-- Main image area with prev/next -->
+        <div class="gallery-main-image-wrap">
+            <button class="gallery-nav-btn prev" id="galleryPrevBtn" title="Previous">&#8592;</button>
+            <img id="galleryMainImg" class="gallery-main-img" src="" alt="Product Image">
+            <button class="gallery-nav-btn next" id="galleryNextBtn" title="Next">&#8594;</button>
+        </div>
+
+        <!-- Product info below image -->
+        <div class="gallery-info-panel">
+            <div class="gallery-title" id="galleryTitle">Product Name</div>
+            <div class="gallery-meta" id="galleryMeta">
+                <!-- badges injected by JS -->
+            </div>
+            <div class="gallery-desc" id="galleryDesc"></div>
+        </div>
+
+        <!-- Thumbnail strip -->
+        <div class="gallery-thumb-strip" id="galleryThumbStrip">
+            <!-- thumbnails injected by JS -->
         </div>
     </div>
 

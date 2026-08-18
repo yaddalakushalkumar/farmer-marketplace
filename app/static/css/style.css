@@ -899,3 +899,396 @@ tr:hover {
 .mt-4 {
     margin-top: 1rem;
 }
+
+/* ===================== PRODUCT IMAGE UPLOAD ZONE ===================== */
+
+.img-upload-zone {
+    border: 2px dashed rgba(46, 139, 78, 0.4);
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, rgba(46,139,78,0.03), rgba(240,165,0,0.03));
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s, transform 0.15s;
+    overflow: hidden;
+    min-height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.img-upload-zone:hover {
+    border-color: var(--primary-light);
+    background: linear-gradient(135deg, rgba(46,139,78,0.07), rgba(240,165,0,0.05));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 92, 54, 0.1);
+}
+
+.img-upload-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(240, 165, 0, 0.07);
+    transform: scale(1.01);
+    box-shadow: 0 8px 24px rgba(240, 165, 0, 0.15);
+}
+
+.img-upload-prompt {
+    padding: 1.75rem;
+    text-align: center;
+    width: 100%;
+}
+
+.img-upload-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.6rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(30,92,54,0.15));
+}
+
+.img-upload-label {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+}
+
+.img-upload-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+/* Preview state inside the upload zone */
+.img-preview-wrap {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.img-preview-thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    border: 2px solid rgba(30,92,54,0.2);
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+}
+
+.img-preview-actions {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.img-preview-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    word-break: break-all;
+    line-height: 1.4;
+}
+
+.img-remove-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #fff5f5;
+    color: #e53e3e;
+    border: 1px solid #fed7d7;
+    border-radius: 50px;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: fit-content;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.img-remove-btn:hover {
+    background: #fed7d7;
+    transform: scale(1.04);
+}
+
+/* Upload progress bar */
+.img-upload-progress {
+    margin-top: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.img-upload-bar {
+    flex: 1;
+    height: 6px;
+    border-radius: 99px;
+    background: #e2e8f0;
+    overflow: hidden;
+    position: relative;
+}
+
+.img-upload-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--primary-light), var(--accent));
+    border-radius: 99px;
+    animation: uploadProgress 1.4s ease-in-out infinite;
+    transform-origin: left;
+}
+
+@keyframes uploadProgress {
+    0%   { transform: scaleX(0.05); left: 0; }
+    50%  { transform: scaleX(0.6); left: 0; }
+    100% { transform: scaleX(0.05); left: 90%; }
+}
+
+#imgUploadStatus {
+    font-size: 0.78rem;
+    color: var(--primary-light);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ===================== PRODUCT IMAGE GALLERY LIGHTBOX ===================== */
+
+/* Gallery icon overlay on product image hover */
+.product-image-container {
+    cursor: zoom-in;
+}
+
+.gallery-overlay-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: rgba(30, 92, 54, 0.88);
+    color: #fff;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+    border: 3px solid rgba(255,255,255,0.6);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    z-index: 5;
+}
+
+.product-image-container:hover .gallery-overlay-btn {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.product-image-container:hover .product-image {
+    transform: scale(1.06);
+    transition: transform 0.4s ease;
+}
+
+/* Lightbox overlay */
+.gallery-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 20, 14, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.gallery-lightbox.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Close button */
+.gallery-close-btn {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.5rem;
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    color: #fff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+    z-index: 10;
+}
+
+.gallery-close-btn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: rotate(90deg);
+}
+
+/* Main image viewer */
+.gallery-main-image-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    padding: 0 5rem;
+}
+
+.gallery-main-img {
+    max-width: 100%;
+    max-height: 65vh;
+    border-radius: var(--radius-lg);
+    object-fit: contain;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    animation: galleryFadeIn 0.35s ease;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.gallery-main-img.fade-out {
+    opacity: 0;
+    transform: scale(0.96);
+}
+
+@keyframes galleryFadeIn {
+    from { opacity: 0; transform: scale(0.93); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* Prev / Next nav arrows */
+.gallery-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    color: #fff;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+    z-index: 5;
+}
+
+.gallery-nav-btn:hover {
+    background: rgba(255,255,255,0.28);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-nav-btn.prev { left: 0.5rem; }
+.gallery-nav-btn.next { right: 0.5rem; }
+
+/* Product info panel below image */
+.gallery-info-panel {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: #fff;
+    max-width: 700px;
+    padding: 0 1rem;
+}
+
+.gallery-info-panel .gallery-title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.4rem;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.gallery-info-panel .gallery-meta {
+    display: flex;
+    justify-content: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 0.6rem;
+}
+
+.gallery-meta-badge {
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 0.3rem 0.9rem;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.gallery-meta-badge.price-badge {
+    background: rgba(240, 165, 0, 0.3);
+    border-color: rgba(240, 165, 0, 0.5);
+    color: #ffd060;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.gallery-desc {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.62);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.65;
+}
+
+/* Thumbnail strip */
+.gallery-thumb-strip {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+    padding: 0.5rem 1rem;
+    overflow-x: auto;
+    max-width: 600px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+
+.gallery-thumb {
+    width: 62px;
+    height: 62px;
+    border-radius: 10px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2.5px solid rgba(255,255,255,0.18);
+    opacity: 0.55;
+    transition: opacity 0.2s, border-color 0.2s, transform 0.2s;
+    flex-shrink: 0;
+}
+
+.gallery-thumb:hover {
+    opacity: 0.85;
+    transform: scale(1.06);
+}
+
+.gallery-thumb.active {
+    border-color: var(--accent-light);
+    opacity: 1;
+    box-shadow: 0 0 0 2px rgba(255,200,59,0.4);
+}
+
+/* Image counter */
+.gallery-counter {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.5);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+}
+
